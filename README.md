@@ -86,12 +86,17 @@ __Day 1:__
 __Day 2:__
 
 *Session 5 :: Inferential Statistics I*
+- Chi-square Test
+- Fisher’s Exact Test
 
 *Session 6 :: Inferential Statistics II*
+- Annova
+- t-test
+- Linear Regression
 
 *Session 7 :: PCA & Hierarchical Clustering*
-- revisiting Rmd
-- clarifying and applying concepts
+- PCA
+- Hierarchical Clustering
 
 *Session 8 :: Practice 2*
 - small project with a report
