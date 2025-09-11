@@ -45,10 +45,6 @@ in the R Console.
 
 All participants must install R, RStudio, and Git before the start of the course. These tools are essential for participating in the course exercises and for following along with the instructions.
 
-> [!IMPORTANT]
-> ### Pre-Course Zoom Session
-> Considering the importance of a smooth  start to our course, we might host a Zoom pre-course session. This session is optional and dependent on the fact that many of you are having trouble setting up your system for the course.
-
 ### Trouble Installing?
 
 If you encounter any issues during the installation process, please:
