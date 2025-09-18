@@ -75,7 +75,7 @@ __Day 1:__
 [*Session 3 :: Data Visualization* ](https://cecadbioinformaticscorefacility.github.io/Intermediate_R_Course_2025/Session3-Data_Visualization_with_ggplot2.html)
 - ggplot2
 
-*Session 4 :: Practice 1*
+[*Session 4 :: Practice 1* ](https://cecadbioinformaticscorefacility.github.io/Intermediate_R_Course_2025/Exercises.html)
 
 
 
