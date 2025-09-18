@@ -64,7 +64,7 @@ __Day 1:__
 
 - Introduction :: Background and History 
 
-[*Session 1 :: Even More Basic Concepts in R*]((https://cecadbioinformaticscorefacility.github.io/Intermediate_R_Course_2025/IntermediateDay1_ModularR.html)
+[*Session 1 :: Even More Basic Concepts in R*](https://cecadbioinformaticscorefacility.github.io/Intermediate_R_Course_2025/IntermediateDay1_ModularR.html)
 - R Function
 - R Packages
 - Package repositories, package ecosystems 
