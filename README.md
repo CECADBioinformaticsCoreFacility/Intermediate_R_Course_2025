@@ -72,7 +72,7 @@ __Day 1:__
 [*Session 2 :: Data Wrangling in R* ](https://cecadbioinformaticscorefacility.github.io/Intermediate_R_Course_2025/Session2-DataWrangling.html#/title-slide)
 - dplyr
   
-*Session 3 :: Data Visualization* 
+[*Session 3 :: Data Visualization* ](https://cecadbioinformaticscorefacility.github.io/Intermediate_R_Course_2025/Session3-Data_Visualization_with_ggplot2.html)
 - ggplot2
 
 *Session 4 :: Practice 1*
