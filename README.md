@@ -62,7 +62,7 @@ We strongly recommend that you try to familiarize yourself with R and RStudio by
 
 __Day 1:__
 
-- Introduction :: Background and History 
+[Introduction :: Background and History](https://cecadbioinformaticscorefacility.github.io/Intermediate_R_Course_2025/IntermediateDay1_Introduction.html)
 
 [*Session 1 :: Even More Basic Concepts in R*](https://cecadbioinformaticscorefacility.github.io/Intermediate_R_Course_2025/IntermediateDay1_ModularR.html)
 - R Function
