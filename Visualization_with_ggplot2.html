@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Introduction to ggplot2</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Bioinfomatics Core Facility" />
+    <meta name="date" content="2025-09-18" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link href="libs/xaringanExtra-extra-styles/xaringanExtra-extra-styles.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-progressBar/progress-bar.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Introduction to ggplot2
+]
+.subtitle[
+## From Base R to Grammar of Graphics
+]
+.author[
+### Bioinfomatics Core Facility
+]
+.institute[
+### CECAD
+]
+.date[
+### 2025-09-18
+]
+
+---
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.panelset {
+   --panel-tab-foreground: grey;
+   --panel-tab-active-foreground: #0051BA;
+   --panel-tab-hover-foreground: #d22;
+   --panel-tab-inactive-opacity: 0.5;
+   --panel-tabs-border-bottom: #ddd;
+   --panel-tab-font-family: Arial;
+}
+
+.footer {
+  color: var(--footer_grey);
+  font-size: 0.5em;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  bottom: 0;
+  border-top: 1px solid var(--cecad_blue);
+  padding: 1rem 64px 1rem 64px;
+}
+
+.remark-inline-code { 
+    font-family: 'Inconsolata', monospace; 
+    color: #515151;
+    border-radius: 2px;
+    width: auto;
+    height: auto;
+    padding: 0px 2px 1px 2px;
+    color: #818181;
+    color: rgb(249, 38, 114);
+}
+
+.comparison-box {
+  border: 2px solid #0051BA;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 10px 0;
+  background-color: #f8f9fa;
+}
+
+/* Make slide titles smaller */
+.remark-slide-content h1 {
+  font-size: 2.2rem !important;  /* Default is usually 2.8rem */
+  margin-bottom: 0.8rem !important;
+}
+
+/* Optional: Also make h2 and h3 proportionally smaller */
+.remark-slide-content h2 {
+  font-size: 1.8rem !important;
+  margin-bottom: 0.6rem !important;
+}
+
+.remark-slide-content h3 {
+  font-size: 1.4rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* Reduce overall text size for better fit */
+.remark-slide-content {
+  font-size: 18px !important;  /* Default is usually 20px */
+  line-height: 1.4 !important;
+}
+
+/* Make code blocks smaller */
+.remark-slide-content .remark-code {
+  font-size: 14px !important;
+}
+
+/* Reduce margins and padding */
+.remark-slide-content p {
+  margin-bottom: 0.8rem !important;
+}
+
+/* Make bullet points more compact */
+.remark-slide-content ul {
+  margin-bottom: 0.8rem !important;
+}
+
+.remark-slide-content li {
+  margin-bottom: 0.3rem !important;
+}
+
+/* Smaller font for Base R code in comparison slides */
+.comparison-box .pull-right pre {
+  font-size: 9px !important;
+  line-height: 1.2 !important;
+}
+
+.comparison-box .pull-right code {
+  font-size: 9px !important;
+}
+
+/* Also make ggplot2 code slightly smaller for consistency */
+.comparison-box .pull-left pre {
+  font-size: 12px !important;
+  line-height: 1.3 !important;
+}
+
+.comparison-box .pull-left code {
+  font-size: 12px !important;
+}
+
+/* Very small font for Base R Challenge Solution slide */
+.tiny-code pre {
+  font-size: 8px !important;
+  line-height: 1.1 !important;
+}
+
+.tiny-code code {
+  font-size: 8px !important;
+}
+
+.base-r {
+  background-color: #ffebee;
+  border-left: 4px solid #f44336;
+}
+
+.ggplot2 {
+  background-color: #e8f5e8;
+  border-left: 4px solid #4caf50;
+}
+
+.pro-tip {
+  background-color: #fff3e0;
+  border: 2px solid #ff9800;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+.learning-objective {
+  background-color: #e3f2fd;
+  border: 2px solid #2196f3;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+&lt;/style&gt;
+
+<style>.xe__progress-bar__container {
+  top:0;
+  opacity: 1;
+  position:absolute;
+  right:0;
+  left: 0;
+}
+.xe__progress-bar {
+  height: 0.25em;
+  background-color: #0051BA;
+  width: calc(var(--slide-current) / var(--slide-total) * 100%);
+}
+.remark-visible .xe__progress-bar {
+  animation: xe__progress-bar__wipe 200ms forwards;
+  animation-timing-function: cubic-bezier(.86,0,.07,1);
+}
+@keyframes xe__progress-bar__wipe {
+  0% { width: calc(var(--slide-previous) / var(--slide-total) * 100%); }
+  100% { width: calc(var(--slide-current) / var(--slide-total) * 100%); }
+}</style>
+
+# Slides &amp; Code
+
+.right-column[
+### <svg aria-hidden="true" role="img" viewBox="0 0 496 512" style="height:1em;width:0.97em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg> git repo
+
+[Intermediate_R_course](https://github.com/CECADBioinformaticsCoreFacility/Intermediate_R_Course_2025)
+
+`git clone https://github.com/CECADBioinformaticsCoreFacility/Intermediate_R_Course_2025.git`
+
+### Github webpage
+
+[https://cecadbioinformaticscorefacility.github.io/Intermediate_R_Course_2025/](https://cecadbioinformaticscorefacility.github.io/Intermediate_R_Course_2025/)
+
+]
+
+.left-column[
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/unnamed-chunk-3-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+- [*p*] presenter view
+- [*o*] overview
+- [*f*] fullscreen
+- [*h*] help/more
+
+]
+
+???
+
+Navigate slides with arrow keys, press *o* for overview and *f* for full screen
+
+---
+class: inverse, center, middle
+
+# From Base R to ggplot2
+## Why Make the Switch?
+
+---
+
+# Learning Objectives
+
+.learning-objective[
+**By the end of this session, you will be able to:**
+
+1. 🎯 **Understand** the difference between base R and ggplot2 plotting approaches
+2. 🔧 **Create** basic plots using ggplot2 syntax
+3. 🎨 **Customize** plots with themes, colors, and labels
+4. 📊 **Choose** appropriate geoms for different data types
+5. 🚀 **Apply** the Grammar of Graphics to build complex visualizations
+]
+
+---
+
+# Base R vs ggplot2: Comparison
+
+.panelset.sideways[
+
+.panel[.panel-name[Base R Approach]
+
+.pull-left[
+**Procedural Thinking**
+- "Draw a canvas"
+- "Add points"
+- "Add lines"
+- "Modify colors"
+
+**Characteristics:**
+- ✅ Quick for simple plots
+- ✅ Part of base R (no dependencies)
+- ✅ Fast execution
+- ❌ Hard to modify complex plots
+- ❌ Inconsistent parameter names
+- ❌ Limited layering capabilities
+
+*_Evidence provided in following slides_
+]
+
+.pull-right[
+
+``` r
+# Base R approach
+plot(iris$Sepal.Length, iris$Sepal.Width,
+     col = as.numeric(iris$Species),
+     pch = 16, cex = 1.2,
+     main = "Sepal Length vs Width",
+     xlab = "Sepal Length (cm)",
+     ylab = "Sepal Width (cm)")
+legend("topright", legend = levels(iris$Species),
+       col = 1:3, pch = 16)
+```
+
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/base-r-example-1.png" width="100%" /&gt;
+]
+]
+
+.panel[.panel-name[ggplot2 Approach]
+
+.pull-left[
+**Declarative Thinking**
+- "Map data to aesthetics"
+- "Choose geometric objects"
+- "Apply transformations"
+- "Layer components"
+
+**Characteristics:**
+- ✅ Consistent grammar
+- ✅ Easy to modify and extend
+- ✅ Excellent for complex plots
+- ✅ Beautiful defaults
+- ❌ Steeper learning curve
+- ❌ Verbose for simple plots
+- ❌ Additional dependency
+- ❌ Can be slower for large datasets
+]
+
+.pull-right[
+
+``` r
+# ggplot2 approach
+library(ggplot2)
+ggplot(iris, aes(x = Sepal.Length, 
+                 y = Sepal.Width, 
+                 color = Species)) +
+  geom_point(size = 2) +
+  labs(title = "Sepal Length vs Width",
+       x = "Sepal Length (cm)",
+       y = "Sepal Width (cm)") +
+  theme_minimal()
+```
+
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/ggplot2-example-1.png" width="100%" /&gt;
+]
+]
+
+.panel[.panel-name[Fair Assessment]
+
+.comparison-box[
+**🤔 Both approaches have trade-offs:**
+
+**Base R Strengths:** Speed, simplicity, no dependencies
+**Base R Weaknesses:** Consistency, modification difficulty
+
+**ggplot2 Strengths:** Grammar, extensibility, beautiful output  
+**ggplot2 Weaknesses:** Learning curve, verbosity, performance
+]
+
+**Key Question:** What matters most for your use case?
+- Quick exploration → Base R might win
+- Publication plots → ggplot2 often wins
+- Team collaboration → ggplot2 usually wins
+
+]
+
+]
+
+---
+
+# Evidence: Base R Inconsistency Issues
+
+.pull-left[
+**Problem 1: Parameter Name Inconsistency**
+
+``` r
+# Different functions, different parameter names
+plot(x, y, col = "red")      # col
+barplot(height, color = "red") # color  
+hist(x, col = "red")         # col again
+boxplot(x, col = "red")      # col
+pie(x, col = "red")          # col
+```
+
+**Problem 2: Color Management**
+
+``` r
+# Base R: Good practice uses variables
+my_colors &lt;- c("red", "blue", "green")
+plot(..., col = my_colors)
+legend(..., col = my_colors) # Consistent!
+
+# But still requires manual legend management
+# ggplot2: Automatic color/legend coordination
+ggplot(..., aes(color = group)) + geom_point()
+```
+]
+
+.pull-right[
+**Problem 3: Limited Layering**
+
+``` r
+# Base R: Hard to add multiple layers elegantly
+plot(iris$Sepal.Length, iris$Sepal.Width, 
+     col = "lightgray", pch = 16)
+# Adding trend line requires separate function
+abline(lm(Sepal.Width ~ Sepal.Length, data = iris), col = "blue")
+```
+
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/base-layer-problem-1.png" width="100%" /&gt;
+
+``` r
+# Adding species-specific trends? Gets complicated...
+```
+
+**These aren't "dealbreakers", but they require workarounds**
+]
+
+---
+
+# Evidence: ggplot2 Disadvantages
+
+.pull-left[
+**Problem 1: Learning Curve**
+
+``` r
+# Beginners often struggle with:
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = "red")) +
+  geom_point()  # Why is there a legend for "red"?
+
+# vs the simpler Base R:
+plot(iris$Sepal.Length, iris$Sepal.Width, col = "red")
+```
+
+**Problem 2: Verbosity for Simple Tasks**
+
+``` r
+# Base R: 1 line
+hist(iris$Sepal.Length)
+
+# ggplot2: 2-3 lines minimum  
+ggplot(iris, aes(x = Sepal.Length)) + 
+  geom_histogram()
+```
+]
+
+.pull-right[
+**Problem 3: Performance with Large Data**
+
+``` r
+# For millions of points, base R can be faster
+system.time(plot(big_data$x, big_data$y))
+# vs
+system.time(ggplot(big_data, aes(x, y)) + geom_point())
+```
+
+**Problem 4: Dependency Management**
+
+``` r
+# Base R plots work everywhere
+plot(x, y)
+
+# ggplot2 requires installation and loading
+library(ggplot2)  # What if it's not available?
+ggplot(data, aes(x, y)) + geom_point()
+```
+
+]
+
+---
+
+# The Grammar of Graphics: Building Blocks
+
+.pull-left[
+**Think in Components:**
+
+1. 📊 **Data** - Your dataset
+2. 🎨 **Aesthetics** - Visual properties (x, y, color)
+3. 🔷 **Geometries** - Plot type (points, lines, bars)
+4. 📐 **Scales** - How data maps to visuals
+5. 🎯 **Facets** - Subplots
+6. 🎨 **Themes** - Overall appearance
+
+**Like LEGO blocks:** Combine simple pieces → complex structures
+]
+
+.pull-right[
+
+``` r
+# Step-by-step building
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width)) +  # Data + Aesthetics
+  geom_point(aes(color = Species), size = 3) +          # Geometry
+  scale_color_manual(values = c("#E74C3C", "#3498DB", "#2ECC71")) + # Scale
+  labs(title = "Grammar of Graphics in Action") +       # Labels
+  theme_minimal()                                       # Theme
+```
+
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/grammar-demo-1.png" width="100%" /&gt;
+]
+
+**Key Insight:** Each `+` adds a layer. Order matters!
+
+---
+
+# Building Plots Step by Step
+
+.panelset[
+
+.panel[.panel-name[Step 1: Data + Aesthetics]
+
+
+``` r
+# Start with data and aesthetic mappings
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species))
+```
+
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/step1-1.png" width="100%" /&gt;
+
+**Result:** Empty plot with scales, but no visual elements yet
+]
+
+.panel[.panel-name[Step 2: Add Geometry]
+
+
+``` r
+# Add geometric objects to represent data
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
+  geom_point(size = 2)
+```
+
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/step2-1.png" width="100%" /&gt;
+
+**Result:** Now we can see the data points!
+]
+
+.panel[.panel-name[Step 3: Enhance]
+
+
+``` r
+# Add labels and theme
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
+  geom_point(size = 2) +
+  labs(title = "Sepal Dimensions", x = "Length (cm)", y = "Width (cm)") +
+  theme_minimal()
+```
+
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/step3-1.png" width="100%" /&gt;
+
+**Result:** Professional-looking plot ready for presentation
+]
+
+]
+
+---
+
+# Essential ggplot2 Components
+
+.panelset.sideways[
+
+.panel[.panel-name[Aesthetics (aes)]
+
+.pull-left[
+**Aesthetics map data to visual properties:**
+
+- `x`, `y` - Position
+- `color` - Color of points/lines
+- `fill` - Fill color of shapes
+- `size` - Size of points
+- `alpha` - Transparency
+- `shape` - Point shapes
+- `linetype` - Line styles
+
+**Global vs Local aesthetics:**
+
+``` r
+# Global - applies to all layers
+ggplot(data, aes(x = var1, y = var2))
+
+# Local - applies to specific geom
+geom_point(aes(color = var3))
+```
+]
+
+.pull-right[
+
+``` r
+# Multiple aesthetics example
+ggplot(iris, aes(x = Sepal.Length, 
+                 y = Sepal.Width)) +
+  geom_point(aes(color = Species,
+                 size = Petal.Length,
+                 shape = Species),
+             alpha = 0.7) +
+  labs(title = "Multiple Aesthetics in Action") +
+  theme_minimal()
+```
+
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/aesthetics-demo-1.png" width="100%" /&gt;
+
+.pro-tip[
+💡 **Remember:** Aesthetics go inside `aes()`, fixed values go outside!
+]
+]
+]
+
+.panel[.panel-name[Common Geometries]
+
+.pull-left[
+**Choose the right geom for your data:**
+
+- **Continuous vs Continuous:** `geom_point()`, `geom_smooth()`
+- **Categorical vs Continuous:** `geom_boxplot()`, `geom_violin()`
+- **Distributions:** `geom_histogram()`, `geom_density()`
+- **Categorical data:** `geom_bar()`, `geom_col()`
+- **Time series:** `geom_line()`, `geom_area()`
+
+**Quick decision guide:**
+- 1 variable → histogram, density
+- 2 variables → scatterplot, boxplot
+- Time series → line plot
+- Categories → bar chart
+]
+
+.pull-right[
+&lt;div class="image-with-caption"&gt;
+  &lt;img src="images/gallery.png" alt="ggplot2 geoms gallery" width="100%", height="350"&gt;
+  &lt;p class="caption"&gt;&lt;font size="3"&gt;&lt;b&gt;source:&lt;/b&gt; https://r-graph-gallery.com/&lt;/font&gt;&lt;/p&gt;
+&lt;/div&gt;
+
+.comparison-box[
+**🎯 Rule of Thumb:** Start with the data relationship, then choose the geom that best shows that relationship.
+]
+]
+]
+
+.panel[.panel-name[Base R vs ggplot2 Geoms]
+
+.pull-left[
+**.base-r[Base R Functions]**
+
+
+``` r
+# Scatterplot
+plot(x, y)
+
+# Histogram  
+hist(x)
+
+# Boxplot
+boxplot(y ~ group)
+
+# Barplot
+barplot(table(x))
+
+# Line plot
+plot(x, y, type = "l")
+```
+]
+
+.pull-right[
+**.ggplot2[ggplot2 Equivalents]**
+
+
+``` r
+# Scatterplot
+geom_point()
+
+# Histogram
+geom_histogram()
+
+# Boxplot  
+geom_boxplot()
+
+# Barplot
+geom_bar() # or geom_col()
+
+# Line plot
+geom_line()
+```
+]
+
+.comparison-box[
+**Key Difference:** ggplot2 geoms are more flexible and can be easily combined!
+]
+
+]
+
+]
+
+---
+
+# Hands-On: Your First ggplot2 Plot
+
+.panelset.sideways[
+
+.panel[.panel-name[The Challenge]
+
+.learning-objective[
+**🎯 Your Turn:** Create a scatterplot comparing Base R and ggplot2
+
+**Goal:** Plot Sepal.Length vs Sepal.Width, colored by Species
+
+**Steps:**
+1. First, try it in Base R
+2. Then, recreate it in ggplot2
+3. Compare the code complexity
+4. Add one enhancement to the ggplot2 version
+]
+
+.pro-tip[
+💡 **Tip:** Don't just copy-paste! Type it out to build muscle memory.
+]
+
+]
+
+.panel[.panel-name[Base R Solution]
+
+.pull-left[
+
+``` r
+# Base R approach
+plot(iris$Sepal.Length, 
+     iris$Sepal.Width,
+     col = c("red", "green", "blue")[iris$Species],
+     pch = 16,
+     cex = 1.2,
+     main = "Sepal Dimensions by Species",
+     xlab = "Sepal Length (cm)",
+     ylab = "Sepal Width (cm)")
+
+# Add legend (gets tricky!)
+legend("topright", 
+       legend = levels(iris$Species),
+       col = c("red", "green", "blue"), 
+       pch = 16,
+       title = "Species")
+```
+
+]
+
+.pull-right[
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/base-r-solution-show-1.png" width="100%" /&gt;
+
+
+**Observations:**
+- 🔴 Manual color assignment
+- 🔴 Separate legend command
+- 🔴 Hard to modify later
+- ✅ Quick for simple plots
+]
+]
+
+.panel[.panel-name[ggplot2 Solution]
+
+.pull-left[
+
+``` r
+# ggplot2 approach
+library(ggplot2)
+
+ggplot(iris, 
+       aes(x = Sepal.Length, 
+           y = Sepal.Width, 
+           color = Species)) +
+  geom_point(size = 2.5) +
+  labs(title = "Sepal Dimensions by Species",
+       x = "Sepal Length (cm)",
+       y = "Sepal Width (cm)") +
+  theme_minimal()
+```
+
+**Observations:**
+- ✅ Automatic color mapping
+- ✅ Automatic legend
+- ✅ Easy to modify
+- ✅ Consistent syntax
+- ✅ Beautiful defaults
+]
+
+.pull-right[
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/ggplot2-solution-show-1.png" width="100%" /&gt;
+]
+]
+
+.panel[.panel-name[Enhancement Challenge]
+
+.pull-left[
+**Now let's enhance the ggplot2 version:**
+
+
+``` r
+ggplot(iris, 
+       aes(x = Sepal.Length, 
+           y = Sepal.Width, 
+           color = Species)) +
+  geom_point(size = 3, alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Sepal Dimensions by Species",
+       subtitle = "With trend lines",
+       x = "Sepal Length (cm)",
+       y = "Sepal Width (cm)",
+       caption = "Data: iris dataset") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+**💭 Try this in Base R... Good luck!**
+]
+
+.pull-right[
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/enhanced-plot-show-1.png" width="100%" /&gt;
+
+.pro-tip[
+💡 **See the power?** Adding trend lines in ggplot2 = one line of code!
+]
+]
+]
+
+]
+
+---
+
+# Base R Solution: The Challenge Accepted!
+
+.pull-left[
+**Challenge:** Recreate the same enhanced plot in Base R
+
+**Requirements:**
+- Scatter plot with colored points by species
+- Different colors for each species
+- Trend lines for each species
+- Professional labels (title, subtitle, axis labels)
+- Legend with proper positioning
+- Alpha transparency for points
+
+**Let's see the complexity...**
+]
+
+.pull-right[
+
+``` r
+# Base R equivalent - much more complex!
+# Set up colors and transparency
+colors &lt;- c("setosa" = "#F8766D", "versicolor" = "#00BA38", "virginica" = "#619CFF")
+alpha_hex &lt;- "B3"  # 70% transparency in hex
+
+# Create the plot
+plot(iris$Sepal.Length, iris$Sepal.Width,
+     col = paste0(colors[iris$Species], alpha_hex),
+     pch = 16, cex = 1.5,
+     main = "",
+     xlab = "", ylab = "",
+     xlim = range(iris$Sepal.Length),
+     ylim = range(iris$Sepal.Width))
+
+# Add trend lines for each species (complex!)
+for(species in levels(iris$Species)) {
+  subset_data &lt;- iris[iris$Species == species, ]
+  lm_model &lt;- lm(Sepal.Width ~ Sepal.Length, data = subset_data)
+  x_seq &lt;- seq(min(subset_data$Sepal.Length), max(subset_data$Sepal.Length), 
+               length.out = 100)
+  y_pred &lt;- predict(lm_model, newdata = data.frame(Sepal.Length = x_seq))
+  lines(x_seq, y_pred, col = colors[species], lwd = 2)
+}
+
+# Add all the labels manually
+title(main = "Sepal Dimensions by Species", 
+      sub = "With trend lines",
+      xlab = "Sepal Length (cm)", 
+      ylab = "Sepal Width (cm)")
+
+# Add legend
+legend("bottomright", legend = levels(iris$Species),
+       col = colors, pch = 16, pt.cex = 1.5,
+       title = "Species", bty = "n")
+
+# Add caption (requires manual positioning)
+mtext("Data: iris dataset", side = 1, line = 3, adj = 1, cex = 0.8, col = "gray50")
+```
+
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/base-r-enhanced-1.png" width="100%" /&gt;
+]
+
+---
+
+# Complexity Comparison: ggplot2 vs Base R
+
+.comparison-box[
+
+.pull-left[
+### ggplot2 Version
+
+
+``` r
+ggplot(iris, aes(x = Sepal.Length, 
+                 y = Sepal.Width, 
+                 color = Species)) +
+  geom_point(size = 3, alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Sepal Dimensions by Species",
+       subtitle = "With trend lines",
+       x = "Sepal Length (cm)",
+       y = "Sepal Width (cm)",
+       caption = "Data: iris dataset") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+]
+
+.pull-right[
+### Base R Version  
+
+``` r
+# Set up colors and transparency
+colors &lt;- c("setosa" = "#F8766D", "versicolor" = "#00BA38", 
+            "virginica" = "#619CFF")
+alpha_hex &lt;- "B3"
+
+# Create base plot
+plot(iris$Sepal.Length, iris$Sepal.Width,
+     col = paste0(colors[iris$Species], alpha_hex),
+     pch = 16, cex = 1.5, main = "", xlab = "", ylab = "")
+
+# Manual trend lines (complex loop!)
+for(species in levels(iris$Species)) {
+  subset_data &lt;- iris[iris$Species == species, ]
+  lm_model &lt;- lm(Sepal.Width ~ Sepal.Length, data = subset_data)
+  x_seq &lt;- seq(min(subset_data$Sepal.Length), 
+               max(subset_data$Sepal.Length), length.out = 100)
+  y_pred &lt;- predict(lm_model, newdata = data.frame(Sepal.Length = x_seq))
+  lines(x_seq, y_pred, col = colors[species], lwd = 2)
+}
+
+# Manual labels and legend
+title(main = "Sepal Dimensions by Species", 
+      sub = "With trend lines", xlab = "Sepal Length (cm)", 
+      ylab = "Sepal Width (cm)")
+legend("bottomright", legend = levels(iris$Species),
+       col = colors, pch = 16, pt.cex = 1.5, title = "Species")
+mtext("Data: iris dataset", side = 1, line = 3, adj = 1, cex = 0.8)
+```
+]
+]
+
+.pro-tip[
+🎯 **Key Insight:** ggplot2's power becomes clear when creating complex, multi-layered visualizations. The grammar of graphics makes complex plots simple and intuitive!
+]
+
+---
+
+# Plot Types: Base R vs ggplot2 Comparison
+
+.panelset.sideways[
+
+.panel[.panel-name[Histograms]
+
+.pull-left[
+**.base-r[Base R]**
+
+``` r
+# Base R histogram
+hist(iris$Sepal.Length,
+     breaks = 20,
+     col = "lightblue",
+     main = "Distribution of Sepal Length",
+     xlab = "Sepal Length (cm)",
+     border = "white")
+```
+
+**Issues:**
+- Fixed color for all data
+- Hard to show groups
+- Limited customization
+]
+
+.pull-right[
+**.ggplot2[ggplot2]**
+
+``` r
+# ggplot2 histogram
+ggplot(iris, aes(x = Sepal.Length, 
+                 fill = Species)) +
+  geom_histogram(bins = 20, 
+                 alpha = 0.7,
+                 position = "identity") +
+  labs(title = "Distribution of Sepal Length",
+       x = "Sepal Length (cm)",
+       y = "Count") +
+  theme_minimal()
+```
+
+**Advantages:**
+- Easy grouping by Species
+- Transparency control
+- Professional appearance
+]
+
+.pull-left[
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/base-hist-show-1.png" width="100%" /&gt;
+]
+
+.pull-right[
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/gg-hist-show-1.png" width="100%" /&gt;
+]
+
+]
+
+.panel[.panel-name[Boxplots]
+
+.pull-left[
+**.base-r[Base R]**
+
+``` r
+# Base R boxplot
+boxplot(Sepal.Length ~ Species, 
+        data = iris,
+        col = c("red", "green", "blue"),
+        main = "Sepal Length by Species",
+        xlab = "Species",
+        ylab = "Sepal Length (cm)")
+```
+
+**Manual work needed:**
+- Specify colors manually
+- Limited styling options
+- Hard to add additional layers
+]
+
+.pull-right[
+**.ggplot2[ggplot2]**
+
+``` r
+# ggplot2 boxplot
+ggplot(iris, aes(x = Species, 
+                 y = Sepal.Length,
+                 fill = Species)) +
+  geom_boxplot(alpha = 0.7) +
+  geom_jitter(width = 0.2, alpha = 0.5) +
+  labs(title = "Sepal Length by Species",
+       x = "Species",
+       y = "Sepal Length (cm)") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+**Easy enhancements:**
+- Automatic colors
+- Easy to add data points
+- Beautiful themes
+]
+
+.comparison-box[
+**Compare the complexity:**
+]
+
+.pull-left[
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/base-box-show-1.png" width="100%" /&gt;
+]
+
+.pull-right[
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/gg-box-show-1.png" width="100%" /&gt;
+]
+
+]
+
+.panel[.panel-name[Complex Plots]
+
+**.ggplot2[What's nearly impossible in Base R but easy in ggplot2:]**
+
+
+``` r
+# Faceted plot with multiple geoms
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width)) +
+  geom_point(aes(color = Species, size = Petal.Length), alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, color = "black", linetype = "dashed") +
+  facet_wrap(~ Species, scales = "free") +
+  labs(title = "Sepal Relationships Across Species",
+       subtitle = "Point size represents petal length",
+       x = "Sepal Length (cm)", y = "Sepal Width (cm)") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/complex-plot-1.png" width="100%" /&gt;
+
+.pro-tip[
+💡 **Challenge:** Try recreating this plot in Base R... You'll appreciate ggplot2's elegance!
+]
+
+]
+
+]
+
+---
+
+# Base R Solution: "Nearly Impossible" Challenge
+
+.pull-left[
+**ggplot2 Version (8 lines):**
+
+``` r
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width)) +
+  geom_point(aes(color = Species, size = Petal.Length), 
+             alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, 
+              color = "black", linetype = "dashed") +
+  facet_wrap(~ Species, scales = "free") +
+  labs(title = "Sepal Relationships Across Species",
+       subtitle = "Point size represents petal length") +
+  theme_minimal()
+```
+
+**✅ What ggplot2 handles automatically:**
+- Faceting across species
+- Color/size mapping
+- Consistent scales
+- Professional styling
+- Easy modifications
+]
+
+.pull-right[
+**Base R Attempt:**
+
+&lt;button onclick="showFullCode()" style="background-color: #FF6B6B; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; margin: 10px 0;"&gt;
+🔍 Click to see the FULL Base R solution (MUCH more lines!)
+&lt;/button&gt;
+
+&lt;div id="fullCodeModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);"&gt;
+  &lt;div style="background-color: white; margin: 5% auto; padding: 20px; border-radius: 8px; width: 80%; height: 80%; overflow-y: auto; position: relative;"&gt;
+    &lt;span onclick="closeFullCode()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;"&gt;&amp;times;&lt;/span&gt;
+    &lt;h3&gt;Complete Base R Solution&lt;/h3&gt;
+    &lt;div class="tiny-code" style="font-size: 10px;"&gt;
+      &lt;pre&gt;&lt;code&gt;# Base R faceting with legends
+
+# Layout: 3 plots + 1 legend panel
+layout(matrix(1:4, 1), widths = c(1, 1, 1, 0.6))
+par(mar = c(4, 4, 3, 1), oma = c(0, 0, 4, 0))
+
+cols &lt;- c(setosa="#F8766D", versicolor="#00BA38", virginica="#619CFF")
+sz   &lt;- function(x) (x - min(iris$Petal.Length)) / diff(range(iris$Petal.Length)) * 2 + 0.5
+xr   &lt;- range(iris$Sepal.Length); yr &lt;- range(iris$Sepal.Width)
+
+for (sp in levels(iris$Species)) {
+  d &lt;- iris[iris$Species == sp, ]
+  plot(Sepal.Width ~ Sepal.Length, d, col=paste0(cols[sp], "B3"), pch=16,
+       cex=sz(d$Petal.Length), xlim=xr, ylim=yr, main=sp,
+       xlab=ifelse(sp=="versicolor", "Sepal Length (cm)", ""),
+       ylab=ifelse(sp=="setosa", "Sepal Width (cm)", ""))
+  abline(lm(Sepal.Width ~ Sepal.Length, d), lty=2, lwd=1.5)
+}
+
+mtext("Sepal Relationships Across Species", side=3, outer=TRUE, line=2.5, cex=1.2, font=2)
+mtext("Point size represents petal length", side=3, outer=TRUE, line=1, col="gray40")
+
+# Legend panel
+par(mar=c(2,2,2,2)); plot.new()
+legend("topleft", names(cols), col=cols, pch=16, title="Species", bty="n", cex=1.1)
+vals &lt;- with(iris, c(min(Petal.Length), median(Petal.Length), max(Petal.Length)))
+legend("topright", paste0(round(vals,1), " cm"), pt.cex=sz(vals), pch=16, col="gray50",
+       title="Petal Length", bty="n", cex=1.1)
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+
+&lt;script&gt;
+function showFullCode() {
+    document.getElementById("fullCodeModal").style.display = "block";
+}
+
+function closeFullCode() {
+    document.getElementById("fullCodeModal").style.display = "none";
+}
+
+// Close modal when clicking outside of it
+window.onclick = function(event) {
+    var modal = document.getElementById("fullCodeModal");
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+&lt;/script&gt;
+
+**❌ Base R Problems:**
+- 20+ lines vs 6 lines!
+- Manual everything
+- Fragile and hard to modify
+- Legends require separate plots
+]
+
+---
+
+# Why Base R Makes This "Nearly Impossible"
+.comparison-box[
+
+.pull-left[
+
+### ggplot2 Version (Concise &amp; Powerful)
+
+**Lines of code:** \~8
+**Complexity:** Low
+**Maintainability:** High
+
+✅ **Automatic faceting** with `facet_wrap()`
+✅ **Consistent scales** handled automatically
+✅ **Color/size mapping** with `aes()`
+✅ **Professional themes** built-in
+✅ **Easy to modify** any component
+
+
+``` r
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width)) +
+  geom_point(aes(color = Species, size = Petal.Length), 
+             alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, 
+              color = "black", linetype = "dashed") +
+  facet_wrap(~ Species) +
+  labs(title = "Sepal Relationships Across Species",
+       subtitle = "Point size represents petal length",
+       x = "Sepal Length (cm)", y = "Sepal Width (cm)") +
+  theme_minimal()
+```
+
+]
+
+.pull-right[
+
+### Base R Version (Verbose &amp; Manual)
+
+**Lines of code:** \~25–30
+**Complexity:** High
+**Maintainability:** Low
+
+❌ **Manual layout management** with `layout()` / `par()`
+❌ **Scale coordination** requires `xlim` / `ylim`
+❌ **Custom size scaling** with helper functions
+❌ **Legends need extra steps** for unified placement
+❌ **Styling (themes, transparency)** requires hacks
+
+**Key Challenges:**
+
+1. No built-in faceting → must loop and set ranges manually
+2. Legends → often need a dedicated panel
+3. Point size mapping → requires writing a scaling function
+4. Layout and titles → managed with `par()` / `mtext()`
+5. Transparency → only via hex color codes
+
+**Result:** Works, but verbose, fragile, and much harder to maintain than `ggplot2`.
+]
+]
+
+.pro-tip[
+🎯 **The Point:** This demonstrates why ggplot2 exists - it makes complex visualizations simple and maintainable!
+]
+
+---
+
+# Customization: Making Beautiful Plots
+
+.panelset.sideways[
+
+.panel[.panel-name[Themes &amp; Styling]
+
+.pull-left[
+**Built-in themes:**
+
+``` r
+# Clean and minimal
+theme_minimal()
+
+# Classic look  
+theme_classic()
+
+# Black and white
+theme_bw()
+
+# Void (no axes)
+theme_void()
+
+# Dark theme
+theme_dark()
+```
+
+**Custom theme elements:**
+
+``` r
+theme(
+  plot.title = element_text(size = 16),
+  axis.text = element_text(size = 12),
+  legend.position = "bottom",
+  panel.grid = element_blank()
+)
+```
+]
+
+.pull-right[
+
+``` r
+library(gridExtra)
+
+p1 &lt;- ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
+  geom_point() + labs(title = "theme_minimal()") + theme_minimal()
+
+p2 &lt;- ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
+  geom_point() + labs(title = "theme_classic()") + theme_classic()
+
+p3 &lt;- ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
+  geom_point() + labs(title = "theme_bw()") + theme_bw()
+
+p4 &lt;- ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
+  geom_point() + labs(title = "theme_dark()") + theme_dark()
+
+grid.arrange(p1, p2, p3, p4, ncol = 2)
+```
+
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/theme-comparison-1.png" width="100%" /&gt;
+]
+]
+
+.panel[.panel-name[Colors &amp; Scales]
+
+.pull-left[
+**Color customization:**
+
+``` r
+# Manual colors
+ggplot(iris, aes(x = Sepal.Length, 
+                 y = Sepal.Width, 
+                 color = Species)) +
+  geom_point(size = 3) +
+  scale_color_manual(
+    values = c("setosa" = "#FF6B6B",
+               "versicolor" = "#4ECDC4", 
+               "virginica" = "#45B7D1")) +
+  labs(title = "Custom Color Palette") +
+  theme_minimal()
+```
+
+**Built-in palettes:**
+
+``` r
+# Viridis (colorblind-friendly)
+scale_color_viridis_d()
+
+# Brewer palettes
+scale_color_brewer(palette = "Set1")
+
+# Manual specification
+scale_color_manual(values = c(...))
+```
+]
+
+.pull-right[
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/color-demo-show-1.png" width="100%" /&gt;
+
+.pro-tip[
+💡 **Tip:** You can think about using colorblind-friendly palettes 
+like viridis or ColorBrewer!
+]
+]
+]
+
+.panel[.panel-name[Labels &amp; Annotations]
+
+.pull-left[
+**Comprehensive labeling:**
+
+``` r
+ggplot(iris, aes(x = Sepal.Length, 
+                 y = Sepal.Width, 
+                 color = Species)) +
+  geom_point(size = 3, alpha = 0.7) +
+  labs(
+    title = "Iris Sepal Measurements",
+    subtitle = "Relationship between length and width",
+    x = "Sepal Length (cm)",
+    y = "Sepal Width (cm)",
+    color = "Iris Species",
+    caption = "Data source: iris dataset"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16),
+    plot.subtitle = element_text(hjust = 0.5, size = 12)
+  )
+```
+]
+
+.pull-right[
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/labels-demo-show-1.png" width="100%" /&gt;
+
+.comparison-box[
+**Remember:** Good plots tell a story. Use titles, subtitles, and captions to guide your reader!
+]
+]
+]
+
+]
+
+---
+
+# Advanced ggplot2 Features
+
+.panelset.sideways[
+
+.panel[.panel-name[Faceting]
+
+.pull-left[
+**Split your data into subplots:**
+
+**facet_wrap()** - One variable
+
+``` r
+facet_wrap(~ Species)
+facet_wrap(~ Species, ncol = 2)
+```
+
+**facet_grid()** - Two variables  
+
+``` r
+facet_grid(Species ~ .)
+facet_grid(. ~ Species)
+facet_grid(var1 ~ var2)
+```
+
+**Free scales:**
+
+``` r
+facet_wrap(~ Species, scales = "free")
+facet_wrap(~ Species, scales = "free_x")
+```
+]
+
+.pull-right[
+
+``` r
+# Create size categories for demonstration
+iris$Size &lt;- ifelse(iris$Sepal.Length &gt; median(iris$Sepal.Length), 
+                    "Large", "Small")
+
+ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) +
+  geom_point(size = 2) +
+  facet_wrap(~ Size, labeller = label_both) +
+  labs(title = "Petal Dimensions by Size Category") +
+  theme_minimal()
+```
+
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/faceting-demo-1.png" width="100%" /&gt;
+
+.pro-tip[
+💡 **Use Case:** Perfect for comparing patterns across groups or conditions!
+]
+]
+]
+
+.panel[.panel-name[Multiple Geoms]
+
+.pull-left[
+**Layer different plot types:**
+
+``` r
+ggplot(iris, aes(x = Species, y = Sepal.Length)) +
+  # Box plot base
+  geom_boxplot(aes(fill = Species), 
+               alpha = 0.7, width = 0.5) +
+  # Add individual points
+  geom_jitter(width = 0.2, alpha = 0.6, size = 2) +
+  # Add mean points
+  stat_summary(fun = mean, geom = "point", 
+               size = 4, color = "red", shape = 17) +
+  labs(title = "Multiple Geoms in One Plot",
+       subtitle = "Boxplot + Points + Means",
+       y = "Sepal Length (cm)") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+**Each layer can have different aesthetics!**
+]
+
+.pull-right[
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/multi-geom-show-1.png" width="100%" /&gt;
+
+.comparison-box[
+**Layering Power:** Each `+` adds a new layer. Order matters - layers are drawn bottom to top!
+]
+]
+]
+
+.panel[.panel-name[Statistical Transformations]
+
+.pull-left[
+**Built-in statistical functions:**
+
+``` r
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width)) +
+  geom_point(aes(color = Species), size = 2) +
+  # Linear regression
+  geom_smooth(method = "lm", se = TRUE, color = "black") +
+  # Separate regression by species
+  geom_smooth(aes(color = Species), method = "lm", se = FALSE) +
+  labs(title = "Linear Relationships",
+       subtitle = "Overall trend (black) vs by species") +
+  theme_minimal()
+```
+
+**Available stat functions:**
+- `stat_smooth()` - Regression lines
+- `stat_summary()` - Summary statistics  
+- `stat_density()` - Density estimates
+- `stat_count()` - Counts
+]
+
+.pull-right[
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/stats-demo-show-1.png" width="100%" /&gt;
+
+.pro-tip[
+💡 **Power Feature:** ggplot2 can calculate statistics on the fly - no need to pre-compute!
+]
+]
+]
+
+]
+
+---
+
+# Common Mistakes &amp; Troubleshooting
+
+.panelset.sideways[
+
+.panel[.panel-name[Syntax Errors]
+
+.pull-left[
+**❌ Common Mistakes:**
+
+1. **Forgetting the `+`**
+
+``` r
+# Wrong
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width))
+geom_point()
+```
+
+2. **Using `%&gt;%` instead of `+`**
+
+``` r
+# Wrong (dplyr syntax)
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width)) %&gt;%
+  geom_point()
+```
+]
+
+.pull-right[
+**❌ More Common Issues:**
+
+3. **Aesthetics outside `aes()`**
+
+``` r
+# Wrong - color should be inside aes()
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, 
+                 color = "blue")) + geom_point()
+```
+
+4. **Missing data argument**
+
+``` r
+# Wrong
+ggplot(aes(x = Sepal.Length, y = Sepal.Width)) +
+  geom_point()
+```
+]
+
+.pro-tip[
+💡 **Debug Tip:** Build your plot step by step. Add one layer at a time!
+]
+]
+
+.panel[.panel-name[Aesthetic Confusion]
+
+.comparison-box[
+**🤔 When to use `aes()` vs when not to?**
+
+**Inside `aes()`:** When mapping data variables to visual properties
+
+**Outside `aes()`:** When setting fixed visual properties
+]
+
+.pull-left[
+**❌ Wrong:**
+
+``` r
+# This creates a legend for "red"!
+ggplot(iris, aes(x = Sepal.Length, 
+                 y = Sepal.Width,
+                 color = "red")) +
+  geom_point() +
+  labs(title = "Oops! Unwanted legend")
+```
+
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/aes-wrong-show-1.png" width="100%" /&gt;
+]
+
+.pull-right[
+**✅ Right:**
+
+``` r
+# Fixed color for all points
+ggplot(iris, aes(x = Sepal.Length, 
+                 y = Sepal.Width)) +
+  geom_point(color = "red") +
+  labs(title = "Clean! No unwanted legend")
+```
+
+&lt;img src="Day1_ggplot2-tmp-only_files/figure-html/aes-right-show-1.png" width="100%" /&gt;
+]
+
+]
+
+.panel[.panel-name[Quick Fixes]
+
+.pull-left[
+**Problem: Plot doesn't show**
+
+``` r
+# Store plot in variable
+p &lt;- ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width)) +
+  geom_point()
+# Don't forget to display it!
+p  # or print(p)
+```
+**Problem: Overlapping text**
+
+``` r
+# Rotate axis labels
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+**Problem: Legend takes too much space**
+
+``` r
+# Move legend
+theme(legend.position = "bottom")
+# Or remove it
+theme(legend.position = "none")
+```
+]
+
+.pull-right[
+**Problem: Need larger text**
+
+``` r
+# Increase base size
+theme_minimal(base_size = 14)
+# Or specific elements
+theme(text = element_text(size = 14))
+```
+**Problem: Too many decimal places**
+
+``` r
+# Format scales
+scale_x_continuous(labels = scales::number_format(accuracy = 0.1))
+```
+**Problem: Want to save plot**
+
+``` r
+ggsave("my_plot.png", width = 8, height = 6, dpi = 300)
+```
+]
+
+]
+
+]
+
+---
+
+# Key Takeaways &amp; Next Steps
+
+.panelset.sideways[
+
+.panel[.panel-name[What We Learned]
+
+.learning-objective[
+**🎯 Key Concepts Mastered:**
+
+✅ **Grammar of Graphics** - Building plots layer by layer
+
+✅ **Base R vs ggplot2** - When and why to choose ggplot2
+
+✅ **Essential Components** - Data, aesthetics, geometries, themes
+
+✅ **Customization** - Colors, themes, labels, and scales
+
+✅ **Advanced Features** - Faceting, multiple geoms, statistical layers
+
+✅ **Troubleshooting** - Common mistakes and how to fix them
+]
+
+.comparison-box[
+**🧠 Mental Model Change:**
+
+**Before:** "How do I draw this specific plot?"
+
+**After:** "How do I map my data to visual elements and layer components?"
+]
+
+]
+
+.panel[.panel-name[ggplot2 vs Base R Summary]
+
+.pull-left[
+**.base-r[Base R - Use When:]**
+- ✅ Quick exploratory plots
+- ✅ Simple, one-off visualizations  
+- ✅ Don't want extra dependencies
+- ✅ Working with base R workflow
+
+**.ggplot2[ggplot2 - Use When:]**
+- 🎨 Need professional-quality plots
+- 🔧 Want easy customization
+- 📊 Creating complex visualizations
+- 🚀 Building reproducible reports
+- 👥 Sharing/presenting to others
+]
+
+.pull-right[
+**The Verdict:**
+
+.pro-tip[
+💡 **Best Practice:** Learn both! Use Base R for quick checks, ggplot2 for final presentations.
+
+**Career Tip:** ggplot2 skills are highly valued in data science roles!
+]
+
+**Remember:**
+- Start with simple plots
+- Build complexity gradually  
+- Focus on telling a story with your data
+- Practice makes perfect!
+]
+
+]
+
+.panel[.panel-name[Next Steps]
+
+.learning-objective[
+
+**Immediate Practice:**
+1. Recreate your favorite Base R plots in ggplot2
+2. Explore different themes and color palettes
+3. Try the exercises with your own data
+
+**Advanced Topics to Explore:**
+- Animations with `gganimate`  
+- Extensions: `ggridges`, `ggbeeswarm`, `patchwork`
+- Custom themes for your lab
+]
+
+- 💡 [TidyTuesday](https://github.com/rfordatascience/tidytuesday) for practice
+
+.pull-right[
+**Resources:**
+- 📚 [R for Data Science](https://r4ds.had.co.nz/) (Chapter 3)
+- 🎨 [ggplot2 Gallery](https://r-graph-gallery.com/)
+- 📖 [ggplot2 Book](https://ggplot2-book.org/)
+
+]
+
+.pro-tip[
+💡 **Final Tip:** The best way to learn ggplot2 is to use it regularly. Start incorporating it into your daily data analysis workflow!
+]
+
+]
+
+]
+
+---
+class: inverse, center, middle
+
+# Thank You!
+
+**Remember:** Every expert was once a beginner! 🌱→🌳
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+  "slideNumberFormat": "%current%",
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "highlightSpans": true,
+  "ratio": "16:9",
+  "countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
