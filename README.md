@@ -69,7 +69,7 @@ __Day 1:__
 - R Packages
 - Package repositories, package ecosystems (Bioconductor!)
 
-*Session 2 :: Data Wrangling in R* 
+[*Session 2 :: Data Wrangling in R* ](https://cecadbioinformaticscorefacility.github.io/Intermediate_R_Course_2025/Session2-DataWrangling.html#/title-slide)
 - dplyr
   
 *Session 3 :: Data Visualization* 
