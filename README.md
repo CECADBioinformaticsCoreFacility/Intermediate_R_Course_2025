@@ -81,11 +81,11 @@ __Day 1:__
 
 __Day 2:__
 
-*Session 5 :: Inferential Statistics I*
+[*Session 5 :: Inferential Statistics I* ](https://cecadbioinformaticscorefacility.github.io/Intermediate_R_Course_2025/Session5-InferentialStatistics.html)
 - Chi-square Test
 - Fisher’s Exact Test
 
-*Session 6 :: Inferential Statistics II*
+[*Session 6 :: Inferential Statistics II* ](https://cecadbioinformaticscorefacility.github.io/Intermediate_R_Course_2025/Session6.html)
 - Annova
 - t-test
 - Linear Regression
