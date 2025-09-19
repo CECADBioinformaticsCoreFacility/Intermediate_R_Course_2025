@@ -90,7 +90,7 @@ __Day 2:__
 - t-test
 - Linear Regression
 
-*Session 7 :: PCA & Hierarchical Clustering*
+[*Session 7 :: PCA & Hierarchical Clustering*](https://cecadbioinformaticscorefacility.github.io/Session7-PCA_and_Hierarchical_Clustering.html)
 - PCA
 - Hierarchical Clustering
 
