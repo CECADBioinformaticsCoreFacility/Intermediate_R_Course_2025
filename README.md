@@ -94,7 +94,7 @@ __Day 2:__
 - PCA
 - Hierarchical Clustering
 
-*Session 8 :: Practice 2*
+[*Session 8 :: Practice 2*](https://cecadbioinformaticscorefacility.github.io/Intermediate_R_Course_2025/Exercises.html)
 - small project with a report
 
 ## Getting Started
