@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Principal Component Analysis &amp; Hierarchical Clustering</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Bioinfomatics Core Facility" />
+    <meta name="date" content="2025-09-19" />
+    <script src="libs/header-attrs-2.29/header-attrs.js"></script>
+    <link href="libs/panelset-0.3.0/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.3.0/panelset.js"></script>
+    <link href="libs/xaringanExtra-extra-styles-0.2.6/xaringanExtra-extra-styles.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-progressBar-0.0.1/progress-bar.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Principal Component Analysis &amp; Hierarchical Clustering
+]
+.author[
+### Bioinfomatics Core Facility
+]
+.institute[
+### CECAD
+]
+.date[
+### 2025-09-19
+]
+
+---
+
+
+
+&lt;style type="text/css"&gt;
+.panelset {
+   --panel-tab-foreground: grey;
+   --panel-tab-active-foreground: #0051BA;
+   --panel-tab-hover-foreground: #d22;
+   --panel-tab-inactive-opacity: 0.5;
+   --panel-tabs-border-bottom: #ddd;
+   --panel-tab-font-family: Arial;
+}
+
+.footer {
+  color: var(--footer_grey);
+  font-size: 0.5em;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  bottom: 0;
+  border-top: 1px solid var(--cecad_blue);
+  padding: 1rem 64px 1rem 64px;
+}
+
+/* Scrollable code blocks with copy functionality */
+.remark-code-container {
+  position: relative;
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+}
+
+.remark-code {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 10px;
+  background-color: #f8f8f8;
+  border-radius: 4px;
+  font-size: 0.8em;
+  line-height: 1.4;
+}
+
+.copy-code-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: #007acc;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  padding: 5px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.3s;
+}
+
+.copy-code-button:hover {
+  opacity: 1;
+  background: #005a9e;
+}
+
+.copy-code-button:active {
+  background: #004080;
+}
+
+.remark-inline-code { 
+    font-family: 'Inconsolata', monospace; 
+    color: #515151;
+    //background-color: rgba(217, 5, 2, 0.2);
+    border-radius: 2px; /* Making border radius */
+    width: auto; /* Making auto-sizable width */
+    height: auto; /* Making auto-sizable height */
+    padding: 0px 2px 1px 2px;  /*Making space around letters */
+    color: #818181;
+    color: rgb(249, 38, 114);
+}
+&lt;/style&gt;
+
+&lt;script&gt;
+// Add copy functionality to code blocks
+document.addEventListener('DOMContentLoaded', function() {
+  // Add copy buttons to all code blocks
+  const codeBlocks = document.querySelectorAll('pre code');
+  
+  codeBlocks.forEach(function(codeBlock) {
+    // Create container wrapper
+    const container = document.createElement('div');
+    container.className = 'remark-code-container';
+    
+    // Wrap the pre element
+    const pre = codeBlock.parentElement;
+    pre.parentNode.insertBefore(container, pre);
+    container.appendChild(pre);
+    
+    // Add copy button
+    const copyButton = document.createElement('button');
+    copyButton.className = 'copy-code-button';
+    copyButton.innerHTML = '📋 Copy';
+    copyButton.onclick = function() {
+      navigator.clipboard.writeText(codeBlock.textContent).then(function() {
+        copyButton.innerHTML = '✅ Copied!';
+        setTimeout(function() {
+          copyButton.innerHTML = '📋 Copy';
+        }, 2000);
+      });
+    };
+    
+    container.appendChild(copyButton);
+  });
+});
+&lt;/script&gt;
+
+<style>.xe__progress-bar__container {
+  top:0;
+  opacity: 1;
+  position:absolute;
+  right:0;
+  left: 0;
+}
+.xe__progress-bar {
+  height: 0.25em;
+  background-color: #0051BA;
+  width: calc(var(--slide-current) / var(--slide-total) * 100%);
+}
+.remark-visible .xe__progress-bar {
+  animation: xe__progress-bar__wipe 200ms forwards;
+  animation-timing-function: cubic-bezier(.86,0,.07,1);
+}
+@keyframes xe__progress-bar__wipe {
+  0% { width: calc(var(--slide-previous) / var(--slide-total) * 100%); }
+  100% { width: calc(var(--slide-current) / var(--slide-total) * 100%); }
+}</style>
+
+---
+class: inverse, center, middle
+
+# Session 3: Principal Component Analysis &amp; Hierarchical Clustering
+
+---
+## Principal Component Analysis (PCA) - Overview
+
+.panelset[
+
+.panel[.panel-name[What is PCA?]
+
+.pull-left[
+**Principal Component Analysis (PCA)** is a **linear** dimensionality reduction technique that transforms high-dimensional data into a lower-dimensional space by finding **new, uncorrelated axes** (called **principal components**) that **maximize the variance** in the data.
+- **Dimensionality Reduction**: PCA sets the focus on just a few components and
+their corresponding genes, which contribute the most to the variation in the data.
+- **Applications**: PCA is widely used in gene expression data (e.g., RNA-Seq) to 
+identify patterns, reduce noise, and cluster samples based on similar gene 
+expression profiles.
+
+]
+.pull-right[
+
+&lt;div class="image-with-caption"&gt;
+  &lt;img src="images/pca_plot.png" alt="PCA Plot" width="100%"&gt;
+  &lt;p class="caption"&gt;&lt;font size="3"&gt;&lt;b&gt;source:&lt;/b&gt; PMID: 34440590 &lt;/font&gt;&lt;/p&gt;
+&lt;/div&gt;
+
+]
+
+]
+
+
+.panel[.panel-name[Applications of PCA]
+
+
+.pull-left[
+- **Data Visualization**  
+  - Reduce high-dimensional data to 2D/3D for easy interpretation  
+  - Capture main sources of variation
+- **Batch Effect Detection**  
+  - Detect (and remove technical) variability between experiments  
+  - Improve biological signal clarity
+- **Population Genetics**  
+  - Visualize genetic diversity and ancestry  
+  - Identify population structure and relationships
+  ]
+  
+.pull-right[
+- **Noise Reduction &amp; Preprocessing**  
+  - Discard irrelevant data and noise  
+  - Clean and compress data for further analysis (e.g., clustering)
+- **Feature Selection**  
+  - Identify the most informative genes or variables  
+  - Focus on principal components that capture the most variance
+- **Gene Expression Analysis**  
+  - Uncover patterns in large datasets (RNA-Seq, microarrays)  
+  - Cluster samples by expression profiles (e.g., healthy vs. diseased)
+  ]
+]
+
+
+
+.panel[.panel-name[Steps in PCA]
+
+
+.pull-left[
+1. **Standardize the Data**:
+   - Biological data may vary in scale (e.g., gene expression values), so data should be standardized (mean = 0, variance = 1).
+2. **Compute Covariance Matrix**:
+   - Determine how the variables (genes) relate to each other.
+3. **Eigenvectors and Eigenvalues**:
+   - **Eigenvectors** are the directions of the maximum variance (the PCs).
+   - **Eigenvalues** tell us how much of the variance each PC explains.
+4. **Select Principal Components**:
+   - Choose the number of PCs to retain, usually based on the total variance explained (e.g., 90% of variance).
+]
+
+.pull-right[
+
+&lt;div class="image-with-caption"&gt;
+  &lt;img src="images/pca_scree_plot.png" alt="Scree Plot" width="100%"&gt;
+  &lt;p class="caption"&gt;&lt;font size="3"&gt;&lt;b&gt;source:&lt;/b&gt; Iris dataset &lt;/font&gt;&lt;/p&gt;
+&lt;/div&gt;
+
+
+]
+
+]
+
+
+.panel[.panel-name[Interpreting PCA]
+.pull-left[
+- **Principal Components**: The first few PCs capture the majority of the variance in the data.
+- **Loadings**: Each PC is a linear combination of the original variables (genes). The loadings tell us which genes contribute most to each PC.
+- **Biological Meaning**:
+   - PC1 might represent major biological differences (e.g., healthy vs. diseased).
+   - PC2 could capture subtler differences.
+   - PC1 is sometime not Component of interest (!!). 
+]
+.pull-right[
+
+&lt;div class="image-with-caption"&gt;
+  &lt;img src="images/pca_loading_plot_seurat.png" alt="PCA Loading Plot" width="90%"&gt;
+  &lt;p class="caption"&gt;&lt;font size="3"&gt;&lt;b&gt;source:&lt;/b&gt; https://satijalab.org/seurat/articles/pbmc3k_tutorial.html &lt;/font&gt;&lt;/p&gt;
+&lt;/div&gt;
+]
+]
+]
+
+---
+
+## Principal component analysis in R
+
+.panelset[
+
+.panel[.panel-name[Data]
+
+``` r
+## Load and display the data
+data("iris")
+
+head(iris)
+```
+
+```
+##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          5.1         3.5          1.4         0.2  setosa
+## 2          4.9         3.0          1.4         0.2  setosa
+## 3          4.7         3.2          1.3         0.2  setosa
+## 4          4.6         3.1          1.5         0.2  setosa
+## 5          5.0         3.6          1.4         0.2  setosa
+## 6          5.4         3.9          1.7         0.4  setosa
+```
+We will use the **iris** dataset, which contains measurements of four features (Sepal Length, Sepal Width, Petal Length, Petal Width) for three species of flowers.
+]
+
+.panel[.panel-name[Perform PCA]
+
+``` r
+## Perform PCA on the iris dataset
+pca_result &lt;- prcomp(iris[, -5], scale. = TRUE)
+
+summary(pca_result)
+```
+
+```
+## Importance of components:
+##                           PC1    PC2     PC3     PC4
+## Standard deviation     1.7084 0.9560 0.38309 0.14393
+## Proportion of Variance 0.7296 0.2285 0.03669 0.00518
+## Cumulative Proportion  0.7296 0.9581 0.99482 1.00000
+```
+We perform **Principal Component Analysis (PCA)** on the **iris** dataset, excluding the species column. PCA helps reduce the dataset's dimensionality while retaining most of its variance.
+]
+
+.panel[.panel-name[Scatterplot (PC1 vs PC2)]
+
+.pull-left[
+
+
+
+
+``` r
+pca_scores &lt;- as.data.frame(pca_result$x)
+ggplot(pca_scores, 
+       aes(PC1, PC2, color = iris$Species)) +
+  geom_point(size = 3) +
+  ggtitle("PCA Scatterplot (PC1 vs PC2)") +
+  xlab(
+    paste("PC1 (", 
+    round(
+    summary(pca_result)$importance[2,1] * 100, 1),
+    "% variance)")) +
+  ylab(
+    paste("PC2 (",
+    round(
+    summary(pca_result)$importance[2,2] * 100, 1),
+    "% variance)")) +
+  theme_minimal()
+```
+]
+
+
+.pull-right[
+![](PCA_and_Hierarchical_Clustering_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+
+]
+
+
+
+This scatterplot shows how samples (flower species) cluster based on the first two principal components. **PC1** explains the most variance, followed by **PC2**.
+]
+
+.panel[.panel-name[Variance Explained]
+
+
+.pull-left[
+
+``` r
+## Calculate explained variance
+eigenvalues &lt;- pca_result$sdev^2
+explained_variance &lt;- eigenvalues / sum(eigenvalues)
+cumulative_variance &lt;- cumsum(explained_variance)
+
+# Plot explained variance
+explained_variance_df &lt;- data.frame(
+  PC = factor(paste0("PC", 1:4), levels = paste0("PC", 1:4)),
+  Proportion = explained_variance
+)
+
+ggplot(explained_variance_df, aes(x = PC, y = Proportion)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  ggtitle("Proportion of Variance Explained") +
+  xlab("Principal Component") +
+  ylab("Proportion of Variance") +
+  theme_minimal()
+```
+]
+
+.pull-right[
+![](PCA_and_Hierarchical_Clustering_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+]
+
+The **Proportion of Variance Explained** plot shows how much variance is captured by each principal component.
+]
+
+.panel[.panel-name[Scree Plot]
+
+.pull-left[
+
+``` r
+## Scree plot showing cumulative variance explained
+cumulative_variance_df &lt;-
+  data.frame(
+    PC = 1:4,
+    CumulativeVariance = cumulative_variance
+)
+
+ggplot(cumulative_variance_df, 
+       aes(x = PC,
+           y = CumulativeVariance)) +
+  geom_line(group = 1, color = "steelblue") +
+  geom_point(size = 3, color = "steelblue") +
+  ggtitle("Cumulative Variance Explained") +
+  xlab("Principal Component") +
+  ylab("Cumulative Variance") +
+  scale_y_continuous(limits = c(0, 1)) +
+  theme_minimal()
+```
+]
+
+.pull-right[
+![](PCA_and_Hierarchical_Clustering_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
+]
+
+This **Scree Plot** helps determining how many PCs are needed to explain most of the data's variance.
+]
+
+
+
+
+]
+
+---
+
+## PCA Loadings Visualization
+
+.panelset[
+
+.panel[.panel-name[Concept]
+.pull-left[
+**Loadings** represent the contribution of each original variable to the principal components.
+
+#### Key Concepts:
+- **Loading values** range from -1 to +1
+- **High absolute values** = strong contribution
+- **Positive values** = same direction as PC
+- **Negative values** = opposite direction to PC
+
+.small[Loadings help identify which original variables drive each principal component.]
+]
+.pull-right[
+![](PCA_and_Hierarchical_Clustering_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+]
+]
+
+.panel[.panel-name[Structure]
+.pull-left[
+#### Components:
+- **Rows**: Original variables
+- **Columns**: Principal components  
+- **Values**: Contribution weights
+
+#### Key Questions:
+1. Which variables contribute most to PC1?
+2. Are any variables negatively correlated?
+3. What biological meaning can we infer?
+
+.small[The loading matrix is the key to interpreting PCA results.]
+]
+.pull-right[
+
+Table: Example: Iris PCA Loadings for PC1 &amp; PC2
+
+|             |    PC1|    PC2|
+|:------------|------:|------:|
+|Sepal.Length |  0.521| -0.377|
+|Sepal.Width  | -0.269| -0.923|
+|Petal.Length |  0.580| -0.024|
+|Petal.Width  |  0.565| -0.067|
+]
+]
+
+.panel[.panel-name[Extract Loadings]
+.pull-left[
+
+``` r
+# Perform PCA
+pca_result &lt;- prcomp(iris[, 1:4], scale. = TRUE)
+# Extract loadings (rotation matrix)
+loadings &lt;- pca_result$rotation
+# View the loadings matrix
+print(loadings)
+# Get loadings for specific PCs
+pc1_loadings &lt;- loadings[, 1]  # PC1 loadings
+pc2_loadings &lt;- loadings[, 2]  # PC2 loadings
+# View loadings for PC1
+print(pc1_loadings)
+```
+
+**What you get**:
+- **Matrix**: Variables × Components
+- **Values**: Contribution weights (-1 to +1)
+- **Names**: Original variable names
+]
+.pull-right[
+![](PCA_and_Hierarchical_Clustering_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
+]
+]
+
+.panel[.panel-name[Prepare Data]
+.pull-left[
+
+``` r
+# Convert loadings to data frame
+loading_df &lt;- data.frame(
+  Variable = rownames(loadings),
+  PC1 = loadings[, 1],PC2 = loadings[, 2],
+  PC3 = loadings[, 3],PC4 = loadings[, 4]
+)
+# For plotting, reshape to long format
+library(tidyr)
+loading_long &lt;- loading_df %&gt;%
+  pivot_longer(cols = starts_with("PC"),
+               names_to = "Component",
+               values_to = "Loading")
+# View the reshaped data
+head(loading_long)
+```
+
+- **Variable** : Original feature names
+- **Component**: PC1, PC2, PC3, PC4
+- **Loading**  : Weight values
+]
+
+.pull-right[
+
+Table: Prepared Loading Data (Long Format)
+
+|Variable     |Component | Loading|
+|:------------|:---------|-------:|
+|Sepal.Length |PC1       |   0.521|
+|Sepal.Length |PC2       |  -0.377|
+|Sepal.Length |PC3       |   0.720|
+|Sepal.Length |PC4       |   0.261|
+|Sepal.Width  |PC1       |  -0.269|
+|Sepal.Width  |PC2       |  -0.923|
+|Sepal.Width  |PC3       |  -0.244|
+|Sepal.Width  |PC4       |  -0.124|
+]
+]
+
+.panel[.panel-name[Bar Plot]
+.pull-left[
+
+
+``` r
+library(ggplot2)
+
+# Bar plot for PC1 loadings
+ggplot(loading_df, aes(x = Variable, y = PC1)) +
+  geom_col(aes(fill = PC1 &gt; 0), 
+           color = "black", width = 0.7) +
+  scale_fill_manual(values = c("FALSE" = "red", 
+                              "TRUE" = "blue")) +
+  labs(title = "PC1 Loadings",
+       x = "Variables", 
+       y = "Loading Value") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+
+# Multiple PCs in one plot
+ggplot(loading_long, aes(x = Variable, y = Loading, 
+                        fill = Component)) +
+  geom_col(position = "dodge", color = "black") +
+  facet_wrap(~ Component, ncol = 2) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+]
+.pull-right[
+![](PCA_and_Hierarchical_Clustering_files/figure-html/unnamed-chunk-19-1.png)&lt;!-- --&gt;
+]
+]
+
+.panel[.panel-name[Biplot]
+.pull-left[
+
+
+``` r
+# Biplot showing PC1 vs PC2 loadings
+ggplot(loading_df, aes(x = PC1, y = PC2)) +
+  geom_point(size = 3, color = "red") +
+  geom_text(aes(label = Variable), 
+            vjust = -0.5, hjust = 0.5, 
+            size = 4, fontface = "bold") +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  labs(title = "PCA Loading Biplot",
+       x = "PC1 Loadings", 
+       y = "PC2 Loadings") +
+  theme_minimal() +
+  coord_equal()
+
+# Add arrows from origin
+ggplot(loading_df, aes(x = PC1, y = PC2)) +
+  geom_segment(aes(xend = PC1, yend = PC2), 
+               x = 0, y = 0,
+               arrow = arrow(length = unit(0.3, "cm")),
+               color = "blue", size = 1) +
+  geom_text(aes(label = Variable), 
+            vjust = -0.5, hjust = 0.5) +
+  theme_minimal()
+```
+]
+.pull-right[
+![](PCA_and_Hierarchical_Clustering_files/figure-html/unnamed-chunk-21-1.png)&lt;!-- --&gt;
+]
+]
+
+]
+
+---
+
+## Hierarchical Clustering - Overview
+
+.panelset[
+.panel[.panel-name[What?]
+.pull-left[
+**Hierarchical Clustering** is an **unsupervised** machine learning technique used to group data into clusters based on similarity, creating a hierarchy of clusters. It builds a **tree-like structure** (dendrogram) that represents nested clusters at various levels.
+- **Agglomerative Method**: Each data point starts as its own cluster, and pairs of clusters are merged based on their similarity until one large cluster forms.
+- **Divisive Method**: The reverse process, where one large cluster is split recursively into smaller clusters.
+]
+.pull-right[
+&lt;div class="image-with-caption"&gt;
+  &lt;img src="images/dendrogram.png" alt="Dendrogram Example" width="100%"&gt;
+  &lt;p class="caption"&gt;&lt;font size="3"&gt;&lt;b&gt;source:&lt;/b&gt; https://www.gastonsanchez.com/visually-enforced/how-to/2012/10/03/Dendrograms/ &lt;/font&gt;&lt;/p&gt;
+&lt;/div&gt;
+]
+]
+
+.panel[.panel-name[Applications]
+.pull-left[
+- **Gene Expression Analysis**
+  - Group genes or samples based on expression profiles  
+  - Identify clusters of similar expression patterns (e.g., healthy vs. diseased)
+- **Customer Segmentation**
+  - Group customers into distinct clusters based on purchasing behavior  
+  - Find patterns in customer demographics and preferences
+- **Document Clustering**
+  - Group similar documents based on content similarity  
+  - Useful in text mining and information retrieval
+]
+.pull-right[
+- **Image Segmentation**
+  - Cluster similar pixels in an image  
+  - Separate objects or regions based on color or intensity
+- **Pattern Recognition**
+  - Group data points with similar characteristics  
+  - Useful in applications like facial recognition or biometrics
+- **Marketing Analysis**
+  - Understand market segments and target specific groups of customers  
+  - Create personalized marketing strategies based on clustering
+]
+]
+
+.panel[.panel-name[Algorithm]
+.pull-left[
+1. **Calculate Distance Matrix**:
+   - Measure the distance (e.g., Euclidean) between every pair of data points.
+2. **Choose a Linkage Method**:
+   - **Single Linkage**: Merge clusters based on the closest pair of points.
+   - **Complete Linkage**: Merge based on the farthest pair of points.
+   - **Average Linkage**: Merge based on the average distance between points.
+3. **Build the Dendrogram**:
+   - Recursively merge clusters and represent the process in a tree structure.
+4. **Cut the Dendrogram**:
+   - Choose a threshold to determine the number of clusters.
+]
+
+.pull-right[
+&lt;div class="image-with-caption"&gt;
+  &lt;img src="images/hclust_dendrogram.png" alt="Dendrogram Hierarchical Clustering" width="100%"&gt;
+  &lt;p class="caption"&gt;&lt;font size="3"&gt;&lt;b&gt;source:&lt;/b&gt; https://www.datanovia.com/en/lessons/examples-of-dendrograms-visualization/ &lt;/font&gt;&lt;/p&gt;
+&lt;/div&gt;
+]
+]
+
+.panel[.panel-name[Interpretation]
+.pull-left[
+- **Dendrogram**: A tree-like diagram that shows the sequence of cluster merges. The height at which two clusters are joined represents their similarity (shorter links indicate more similar clusters).
+- **Clusters**: You can choose how many clusters to create by cutting the dendrogram at a certain height. 
+- **Biological Meaning**:
+   - Clusters can group samples or genes with similar biological characteristics.
+   - Patterns may help in identifying disease subtypes, evolutionary relationships, or functional similarities.
+]
+.pull-right[
+
+&lt;div class="image-with-caption" style="height: 350px; overflow: hidden;"&gt;
+  &lt;img src="images/hclust_heatmap.png" alt="Heatmap and Dendrogram" style="width: 90%; height: 100%; object-fit: contain;"&gt;
+  &lt;p class="caption"&gt;&lt;font size="3"&gt;&lt;b&gt;source:&lt;/b&gt; https://bioinformatics.ccr.cancer.gov/docs/data-visualization-with-r/Lesson5_intro_to_ggplot/ &lt;/font&gt;&lt;/p&gt;
+&lt;/div&gt;
+]
+]
+]
+---
+
+## Linkage Methods in Hierarchical Clustering
+
+.panelset[
+
+.panel[.panel-name[Principle]
+.pull-left[
+**Linkage** defines how the distance between clusters is calculated when merging them during hierarchical clustering.
+
+**The Process**:
+1. **Start**: Each data point is its own cluster
+2. **Merge**: Find the two closest clusters based on linkage criteria
+3. **Update**: Calculate new distances using the linkage method
+4. **Repeat**: Until all points are in one cluster
+
+**Key Question**:
+*"How do we measure distance between clusters containing multiple points?"*
+
+.small[The linkage method determines the shape and compactness of resulting clusters.]
+]
+.pull-right[
+![](PCA_and_Hierarchical_Clustering_files/figure-html/unnamed-chunk-22-1.png)&lt;!-- --&gt;
+]
+]
+
+.panel[.panel-name[Complete Link.]
+.pull-left[
+**Distance = Maximum distance between any two points in different clusters**
+
+**Characteristics**:
+- Uses the **farthest** points between clusters
+- Creates **compact, spherical** clusters
+- **Sensitive to outliers**
+- Tends to create clusters of similar size
+
+**Formula**:
+```
+d(A,B) = max(distance(a,b))
+where a ∈ A, b ∈ B
+```
+
+**Best for**:
+- When you want well-separated, tight clusters
+- Avoiding elongated cluster shapes
+]
+.pull-right[
+![](PCA_and_Hierarchical_Clustering_files/figure-html/unnamed-chunk-23-1.png)&lt;!-- --&gt;
+]
+]
+
+.panel[.panel-name[Single Link.]
+.pull-left[
+**Distance = Minimum distance between any two points in different clusters**
+
+**Characteristics**:
+- Uses the **closest** points between clusters
+- Can create **elongated chains** of clusters
+- **Susceptible to noise** and outliers
+- May result in unbalanced cluster sizes
+
+**Formula**:
+```
+d(A,B) = min(distance(a,b))
+where a ∈ A, b ∈ B
+```
+
+**Best for**:
+- Detecting clusters with irregular shapes
+- When clusters may have varying densities
+]
+.pull-right[
+![](PCA_and_Hierarchical_Clustering_files/figure-html/unnamed-chunk-24-1.png)&lt;!-- --&gt;
+]
+]
+
+.panel[.panel-name[Average Link.]
+.pull-left[
+**Distance** = Average of all pairwise distances between points in different clusters**
+
+**Characteristics**:
+- Uses **all pairwise distances** between clusters
+- **Balanced approach** between single and complete
+- Less sensitive to outliers than single linkage
+- Creates moderately compact clusters
+
+**Formula**:
+```
+d(A,B) = (1/|A||B|) × Σ distance(a,b)
+where a ∈ A, b ∈ B
+```
+
+**Best for**:
+- General-purpose clustering
+- When you want robust, moderate-sized clusters
+]
+.pull-right[
+![](PCA_and_Hierarchical_Clustering_files/figure-html/unnamed-chunk-25-1.png)&lt;!-- --&gt;
+]
+]
+
+.panel[.panel-name[Ward Link.]
+.pull-left[
+**Distance = Increase in within-cluster sum of squares when merging clusters**
+
+**Characteristics**:
+- Minimizes **within-cluster variance**
+- Creates **highly compact, spherical** clusters
+- Tends to create clusters of **similar sizes**
+- Most commonly used in practice
+
+**Formula**:
+```
+d(A,B) = √(2|A||B|/(|A|+|B|)) × ||μₐ - μᵦ||
+where μₐ, μᵦ are cluster centroids
+```
+
+**Best for**:
+- When you want well-separated, balanced clusters
+- Exploratory data analysis
+- Most biological applications
+]
+.pull-right[
+![](PCA_and_Hierarchical_Clustering_files/figure-html/unnamed-chunk-26-1.png)&lt;!-- --&gt;
+]
+]
+
+.panel[.panel-name[Visuals]
+.pull-left[
+
+``` r
+# Compare different linkage methods
+methods &lt;- c("complete", "single", 
+             "average", "ward.D2")
+
+# Create dendrograms with different methods
+par(mfrow = c(2, 2))
+for(method in methods) {
+  hc &lt;- hclust(dist(iris[, -5]), 
+               method = method)
+  plot(hc, main = paste("Linkage:", method),
+       labels = FALSE, cex.main = 1.2)
+}
+```
+
+.small[Each method produces different dendrogram structures, affecting how clusters are formed and merged.]
+]
+.pull-right[
+![](PCA_and_Hierarchical_Clustering_files/figure-html/unnamed-chunk-28-1.png)&lt;!-- --&gt;
+]
+]
+
+.panel[.panel-name[Selection]
+.pull-left[
+**Choosing the Right Method**
+
+| **Method** | **Best For** | **Cluster Shape** |
+|------------|-------------|-------------------|
+| **Complete** | Well-separated data | Compact, spherical |
+| **Single** | Irregular shapes | Chains, elongated |
+| **Average** | General purpose | Moderate size |
+| **Ward** | Balanced clusters | Spherical, similar sizes |
+
+**Decision Framework**:
+1. **Data exploration** → Start with **Ward**
+2. **Compact clusters** → Use **Complete**  
+3. **Irregular shapes** → Try **Single**
+4. **Robust approach** → Use **Average**
+
+.small[Ward linkage is most commonly used in biological data analysis.]
+]
+.pull-right[
+**R Implementation**
+
+
+``` r
+# Basic syntax
+hclust(distance_matrix, method = "complete")
+hclust(distance_matrix, method = "single")
+hclust(distance_matrix, method = "average")
+hclust(distance_matrix, method = "ward.D2")
+
+# Complete example
+data &lt;- iris[, -5]  # Remove species column
+dist_matrix &lt;- dist(data)
+
+# Try different methods
+hc_complete &lt;- hclust(dist_matrix, method = "complete")
+hc_ward &lt;- hclust(dist_matrix, method = "ward.D2")
+
+# Plot comparison
+par(mfrow = c(1, 2))
+plot(hc_complete, main = "Complete Linkage")
+plot(hc_ward, main = "Ward Linkage")
+
+# Cut into clusters
+clusters_complete &lt;- cutree(hc_complete, k = 3)
+clusters_ward &lt;- cutree(hc_ward, k = 3)
+```
+
+### Key Parameters:
+- **method**: Linkage algorithm
+- **k**: Number of clusters (for cutree)
+- **h**: Height to cut (alternative to k)
+]
+]
+
+]
+
+---
+
+## Hierarchical Clustering in R
+
+.panelset[
+
+
+.panel[.panel-name[Data]
+
+``` r
+## Load and display the data
+data("iris")
+head(iris)
+```
+
+```
+##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          5.1         3.5          1.4         0.2  setosa
+## 2          4.9         3.0          1.4         0.2  setosa
+## 3          4.7         3.2          1.3         0.2  setosa
+## 4          4.6         3.1          1.5         0.2  setosa
+## 5          5.0         3.6          1.4         0.2  setosa
+## 6          5.4         3.9          1.7         0.4  setosa
+```
+We will use the **iris** dataset, which contains measurements of four features (Sepal Length, Sepal Width, Petal Length, Petal Width) for three species of flowers.
+]
+
+.panel[.panel-name[Perform Hierarchical Clustering]
+.pull-left[
+
+``` r
+## Calculate the distance matrix &amp; 
+## perform hierarchical clustering
+distance_matrix &lt;- dist(iris[, -5])
+hclust_result &lt;- 
+  hclust(distance_matrix,
+         method = "complete")
+
+# Create color mapping for species
+species_colors &lt;- c("setosa" = "red", 
+                   "versicolor" = "blue", 
+                   "virginica" = "green")
+leaf_colors &lt;- species_colors[iris$Species]
+
+# Load dendextend quietly
+suppressPackageStartupMessages(library(dendextend))
+
+# Convert to dendrogram and color the leaves
+dend &lt;- as.dendrogram(hclust_result)
+dend &lt;- color_labels(dend, col = leaf_colors)
+
+# Plot the dendrogram with colored leaves
+plot(dend, 
+     main = "Dendrogram with Species-Colored Leaves",
+     leaflab = "none")
+
+# Add colored points at leaf positions
+leaf_order &lt;- order.dendrogram(dend)
+points(seq_along(leaf_order), rep(0, length(leaf_order)), 
+       col = leaf_colors[leaf_order], pch = 19, cex = 1.5)
+
+# Add legend
+legend("topright", 
+       legend = names(species_colors),
+       col = species_colors,
+       pch = 19,
+       title = "Species",
+       cex = 1.2)
+```
+
+]
+.pull-right[
+![](PCA_and_Hierarchical_Clustering_files/figure-html/unnamed-chunk-32-1.png)&lt;!-- --&gt;
+We perform **Hierarchical Clustering** on the **iris** dataset using the complete linkage method. The dendrogram shows how the data points are grouped.
+]
+
+]
+
+.panel[.panel-name[Heatmap with Dendrogram]
+.pull-left[
+
+``` r
+## Create a heatmap with hierarchical
+## clustering
+library(pheatmap)
+# Define annotation colors for species
+annotation_colors &lt;- list(
+  Species = c(setosa = "red", 
+              versicolor = "blue", 
+              virginica = "green")
+)
+# Perform hierarchical clustering
+pheatmap(
+  as.matrix(iris[, -5]),
+  clustering_distance_rows = "euclidean",
+  annotation_colors = annotation_colors,
+  clustering_method = "complete",
+  annotation_col = iris["Species"],
+  main = "Heatmap with Dendrogram")
+```
+
+]
+.pull-right[
+&lt;span style="font-size: 0.6em;"&gt;The heatmap shows the clustering of samples and features along with a dendrogram, which helps identify the groupings.&lt;/span&gt;
+
+![](PCA_and_Hierarchical_Clustering_files/figure-html/unnamed-chunk-34-1.png)&lt;!-- --&gt;
+
+]
+]
+
+.panel[.panel-name[Choosing the Number of Clusters]
+.pull-left[
+
+``` r
+library(dplyr)
+## Cut the dendrogram to obtain clusters
+cutree(hclust_result, k = 3) %&gt;% table()
+```
+
+```
+## .
+##  1  2  3 
+## 50 72 28
+```
+You can choose the number of clusters by cutting the dendrogram at a certain height. Here, we cut the dendrogram into **3 clusters**. The colored rectangles show the division into 3 clusters, based on the dendrogram structure. This allows you to select the number of clusters that best fits your data.
+]
+.pull-right[
+
+``` r
+## Visualizing clusters
+cluster_labels &lt;- cutree(hclust_result,  k = 3)
+plot(hclust_result)
+rect.hclust(hclust_result, k = 3, border = 2:4)
+```
+
+![](PCA_and_Hierarchical_Clustering_files/figure-html/unnamed-chunk-36-1.png)&lt;!-- --&gt;
+
+
+]
+]
+
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+  "slideNumberFormat": "%current%",
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "highlightSpans": true,
+  "ratio": "16:9",
+  "countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
