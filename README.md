@@ -3,7 +3,7 @@
 > [!NOTE]
 >
 > <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/info.svg" width="15" height="15"> 
-> LAST UPDATE: 11.09.2025
+> LAST UPDATE: 19.09.2025
 
 # R Programming Course for Biologists
 
@@ -31,6 +31,8 @@ You can find the installation guides once you click on them:
   - [rmarkdown](https://cran.r-project.org/package=rmarkdown)
   - [dplyr](https://cran.r-project.org/package=dplyr)
   - [ggplot2](https://cran.r-project.org/package=ggplot2)
+  - [pheatmap](https://cran.r-project.org/package=pheatmap)
+  - [dendextend](https://cran.r-project.org/web/package=dendextend)
 
 **To install these packages, you can use the following R command:**
 
