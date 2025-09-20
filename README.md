@@ -37,7 +37,7 @@ You can find the installation guides once you click on them:
 **To install these packages, you can use the following R command:**
 
 ```r
-install.packages(c("knitr", "markdown", "dplyr", "ggplot2"))
+install.packages(c("knitr", "markdown", "dplyr", "ggplot2", "pheatmap", "dendextend"))
 ```
 in the R Console.
 
